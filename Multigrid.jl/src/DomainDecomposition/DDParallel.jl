@@ -1,0 +1,180 @@
+export setupDDParallel
+export getWorkerForSubDomainMultiColor,solveDDParallel
+
+
+function setupDDParallel(AT::Union{SparseMatrixCSC,DomainDecompositionOperatorConstructor{VAL,IND}},DDparam::DomainDecompositionParam{VAL,IND},workerList::Array{Int64}; extension_val=1) where {VAL,IND}
+if workerList==[]
+	return setupDDSerial(AT,DDparam);
+else
+	ActualWorkers = intersect(workerList,workers());
+	if length(ActualWorkers)<length(workerList)
+		warn("setupDDParallel: workerList included indices of non-existing workers.")
+	end
+	DDparam.workers = ActualWorkers;
+end
+numWorkers = length(ActualWorkers);
+println("### AW = $(ActualWorkers) ###")
+M 			= DDparam.Mesh;
+numDomains 	= DDparam.numDomains;
+overlap 	= DDparam.overlap;
+n = M.n;
+
+
+
+DDPreconditioners 	= Array{RemoteChannel}(undef,prod(numDomains));
+DDparam.GlobalIndices = Array{Array{DDIndType}}(undef,prod(numDomains));
+DDparam.GlobalIndices_extended = Array{Array{DDIndType}}(undef,prod(numDomains));
+DDResidualComp = Array{RemoteChannel}(undef, prod(numDomains));
+# ix = 1; nextidx() = (idx=ix; ix+=1; idx)
+
+@sync begin
+	for p = ActualWorkers
+		@async begin
+			# while true
+				# idx = nextidx()
+				# if idx > numWorkers
+					# break
+				# end
+				for ii=1:length(DDPreconditioners)
+					i = cs2loc(ii,numDomains);
+					worker_index = getWorkerForSubDomainMultiColor(i,numDomains,numWorkers);
+					
+					# println("For cell ",i," we need worker ",ActualWorkers[worker_index],", and we have ",p)
+					if ActualWorkers[worker_index] == p
+						# IIp = DDparam.getIndicesOfCell(numDomains,overlap, i,n);
+						IIp, IIp_shape 	= DDparam.getIndicesOfCell(numDomains,overlap, i,n);
+						IIp_ext, IIp_ext_shape 	= DDparam.getIndicesOfCell(numDomains,overlap.+extension_val, i,n);
+						subMesh = getSubMeshOfCell(numDomains,overlap,i,M);
+						subMesh_ext = getSubMeshOfCell(numDomains,overlap.+extension_val,i,M);
+
+						#println("before sending worker ",p," to setup subdomain",i,", for color ",cellColor(i))
+						if isa(AT,SparseMatrixCSC)==true
+							AI = sparse(AT[IIp,IIp]');
+							DDPreconditioners[ii] = initRemoteChannel(performSetup,p,i, AI,  DDparam,subMesh);
+						else
+							# subparams = AT.getSubParams(AT.problem_param, M,i,numDomains,overlap);
+							# AI = DomainDecompositionOperatorConstructor{VAL,IND}(subparams,AT.getSubParams,AT.getOperator,AT.getDirichletMass);
+							# DDPreconditioners[ii] = initRemoteChannel(performSetup,p,i, AI,  DDparam,subMesh);
+
+							###
+							if length(n) == 3
+								code = [i[1]!=1 i[1]!=numDomains[1]; i[2]!=1 i[2]!=numDomains[2]; i[3]!=1 i[3]!=numDomains[3];];
+							else
+								code = [i[1]!=1 i[1]!=numDomains[1]; i[2]!=1 i[2]!=numDomains[2]];
+							end
+							subparams = AT.getSubParams(AT.problem_param, M,i,numDomains,overlap);
+							AI = DomainDecompositionOperatorConstructor{VAL,IND}(subparams,AT.getSubParams,AT.getOperator,AT.getDirichletMass);
+							DDPreconditioners[ii] = initRemoteChannel(performSetup,p,i, AI,  DDparam,subMesh);
+							# DDResidualComp[ii] = setupResComp(DDPreconditioners[ii].Ainv, IIp_ext_shape, IIp_shape, code)
+
+							subparams_ext = AT.getSubParams(AT.problem_param, M,i,numDomains,overlap.+extension_val);
+							AI_ext = DomainDecompositionOperatorConstructor{VAL,IND}(subparams_ext,AT.getSubParams,AT.getOperator,AT.getDirichletMass);
+							DDPreconditioners_ii_ext = performSetup(i, AI_ext,  DDparam,subMesh_ext);
+							DDResidualComp[ii] = initRemoteChannel(setupResComp,p,DDPreconditioners_ii_ext.Ainv, IIp_ext_shape, IIp_shape, code)
+
+							###
+						end
+						#println("after sending worker ",p," to setup subdomain",i,", for color ",cellColor(i))
+						# IIp = convert(Array{DDIndType},IIp);
+						# DDparam.GlobalIndices[ii] = IIp;
+						# wait(DDPreconditioners[ii]);
+
+						IIp = convert(Array{DDIndType},IIp);
+						IIp_ext = convert(Array{DDIndType},IIp_ext);
+						DDparam.GlobalIndices[ii] = IIp;
+						DDparam.GlobalIndices_extended[ii] = IIp_ext;
+						wait(DDPreconditioners[ii]);
+						wait(DDResidualComp[ii]);
+
+					end
+				end
+			# end
+		end
+	end
+end
+DDparam.PrecParams = DDPreconditioners;
+DDparam.AI = DDResidualComp
+return DDparam;
+end
+
+
+function solveDDParallel(AT,b::Array,x::Array,DDparam::DomainDecompositionParam{VAL,IND},workerList,niter=1,doTranspose::Int64=0) where {VAL,IND}
+if workerList==[]
+	return solveDD(AT,b,x,DDparam,niter,doTranspose);
+else
+	ActualWorkers = intersect(workerList,workers());
+	if length(ActualWorkers)<length(workerList)
+		error("setupDDParallel: workerList included indices of non-existing workers:",workerList,",",ActualWorkers)
+	end
+end
+numWorkers = length(ActualWorkers);
+
+
+numDomains 	= DDparam.numDomains;
+overlap 	= DDparam.overlap;
+dim 		= length(DDparam.numDomains);
+
+for k=1:niter
+	for color = 1:2^dim
+	@sync begin
+			# ix = 1; nextidx() = (idx=ix; ix+=1; idx)
+			for p = ActualWorkers
+				@async begin
+					# while true
+						# idx = nextidx()
+						# if idx > numWorkers
+							# break
+						# end
+						for ii=1:prod(numDomains)
+							i = cs2loc(ii,numDomains);
+							if ActualWorkers[getWorkerForSubDomainMultiColor(i,numDomains,numWorkers)] == p && cellColor(i)==color
+								IIp = DDparam.GlobalIndices[ii];
+								IIp_ext = DDparam.GlobalIndices_extended[ii];
+
+								# r = computeResidualAtIdx(AT,b,x,IIp);
+								r = remotecall_fetch(computeResidual,p,DDparam.AI[ii],b[IIp], x[IIp_ext]);
+								if DDparam.PrecParams[ii].where != p
+									error("Sending to wrong worker!!!");
+								end
+								#println("before sending worker ",p," to solve subdomain",i,", for color ",cellColor(i))
+								(t,DDparam.PrecParams[ii]) = remotecall_fetch(solveSubDomain, p, r, DDparam.PrecParams[ii],doTranspose);
+								x[IIp] = x[IIp] + t;
+								#println("after sending worker ",p," to solve subdomain",i,", for color ",cellColor(i))
+							end
+						end
+					# end
+				end
+			end
+		end
+	end
+	if niter > 1
+		println(k,": ",norm(b - AT'*x)/norm(b))
+	end
+end
+return x,DDparam;
+end
+
+
+function solveSubDomain(r,precRef::RemoteChannel,doTranspose::Int64)
+	prec = take!(precRef);
+	t = zeros(eltype(r),size(r));
+	(t,prec.Ainv) = solveLinearSystem!(prec.A_i,r,t,prec.Ainv,doTranspose);
+	precRef = put!(precRef,prec)
+	return (t,precRef)
+end
+
+
+function computeResidual(resCompRef::RemoteChannel,b,x)
+	resComp = take!(resCompRef)
+	r = computeResidual(resComp,b,x)
+	resCompRef = put!(resCompRef,resComp)
+	return r
+end
+
+function getWorkerForSubDomainMultiColor(iiloc::Array{Int64},NumCells,NumWorkers)
+	NumCellsWorkers = div.(NumCells.+1,2);
+	iiploc = div.(iiloc.+1,2);
+	iip = loc2cs(iiploc,NumCellsWorkers);
+	p = mod(iip-1,NumWorkers)+1;
+	return p;
+end

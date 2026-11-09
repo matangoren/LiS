@@ -1,0 +1,64 @@
+cpu_1025_1025_4_4_linear_LiS_1_5_tol-0.1.csv:
+  Total iterations: 4676
+  Mean iterations: 4.470363
+  Std iterations: 0.694876
+  Total time: 16.567881
+  Mean time: 0.015839
+  Std time: 0.003137
+
+cpu_1025_1025_4_4_linear_compactLiS_1_5_tol-0.1.csv:
+  Total iterations: 4920
+  Mean iterations: 4.703633
+  Std iterations: 0.570508
+  Total time: 8.807538
+  Mean time: 0.008420
+  Std time: 0.002667
+
+cpu_257_257_1_1_linear_LiS_1_5_tol-0.1.csv:
+  Total iterations: 101
+  Mean iterations: 3.366667
+  Std iterations: 0.556053
+  Total time: 1.660451
+  Mean time: 0.055348
+  Std time: 0.228480
+
+cpu_257_257_1_1_linear_compactLiS_1_5_tol-0.1.csv:
+  Total iterations: 136
+  Mean iterations: 4.250000
+  Std iterations: 0.672022
+  Total time: 2.518333
+  Mean time: 0.078698
+  Std time: 0.376299
+
+cpu_257_257_257_1_1_1_linear_LiS_1_5_tol-0.1.csv:
+  Total iterations: 101
+  Mean iterations: 3.607143
+  Std iterations: 0.566947
+  Total time: 99.709162
+  Mean time: 3.561041
+  Std time: 0.502943
+
+cpu_257_257_257_1_1_1_linear_compactLiS_1_5_tol-0.1.csv:
+  Total iterations: 119
+  Mean iterations: 4.250000
+  Std iterations: 0.645497
+  Total time: 57.445565
+  Mean time: 2.051627
+  Std time: 0.272686
+
+cpu_33_33_33_1_1_1_linear_LiS_1_5_tol-0.1.csv:
+  Total iterations: 54
+  Mean iterations: 3.375000
+  Std iterations: 0.500000
+  Total time: 1.367534
+  Mean time: 0.085471
+  Std time: 0.324341
+
+cpu_33_33_33_1_1_1_linear_compactLiS_1_5_tol-0.1.csv:
+  Total iterations: 48
+  Mean iterations: 3.000000
+  Std iterations: 0.000000
+  Total time: 1.500012
+  Mean time: 0.093751
+  Std time: 0.353603
+

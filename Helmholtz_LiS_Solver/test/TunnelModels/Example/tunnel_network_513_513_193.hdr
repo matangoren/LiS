@@ -1,0 +1,5 @@
+nx=513
+ny=513
+nz=193
+dtype=uint8 order=column-major(x-fastest)
+0=rock 1=air

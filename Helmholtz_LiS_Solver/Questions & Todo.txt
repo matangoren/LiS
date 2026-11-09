@@ -1,0 +1,6 @@
+Questions:
+    - Not sure I understand why the convolution of Green's function and the source matrix is our solution we seek for.
+    - Why is g_temp of size 2n*2n? 
+      I understand that with the padding of q we will get the isolation (like non-periodic BC) - but does it have to be of this size? 
+      Why not smaller?
+    - Green's function is practically (Hop)^-1 (only the middle column of it).

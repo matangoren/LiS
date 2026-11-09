@@ -1,0 +1,48 @@
+cpu_1025_257_1_1_marmousi_GMRES_20_20_tol-0.1.csv:
+  Total iterations: 1845
+  Mean iterations: 46.125000
+  Std iterations: 3.345012
+  Total time: 4.615398
+  Mean time: 0.115385
+  Std time: 0.216945
+
+cpu_4097_1025_1_1_marmousi_GMRES_20_20_tol-0.1.csv:
+  Total iterations: 4529
+  Mean iterations: 52.662791
+  Std iterations: 14.668582
+  Total time: 145.807368
+  Mean time: 1.695435
+  Std time: 0.414507
+
+cpu_4097_1025_1_4_marmousi_GMRES_20_20_tol-0.1.csv:
+  Total iterations: 22371
+  Mean iterations: 69.046296
+  Std iterations: 20.703143
+  Total time: 257.462831
+  Mean time: 0.794638
+  Std time: 0.191360
+
+cpu_4097_1025_2_8_marmousi_GMRES_20_20_tol-0.1.csv:
+  Total iterations: 60839
+  Mean iterations: 46.090152
+  Std iterations: 9.258002
+  Total time: 228.755056
+  Mean time: 0.173299
+  Std time: 0.111406
+
+cpu_4097_1025_4_16_marmousi_GMRES_20_20_tol-0.1.csv:
+  Total iterations: 201891
+  Mean iterations: 36.734170
+  Std iterations: 6.321110
+  Total time: 178.451097
+  Mean time: 0.032469
+  Std time: 0.032798
+
+cpu_4097_1025_8_32_marmousi_GMRES_20_20_tol-0.1.csv:
+  Total iterations: 655557
+  Mean iterations: 26.679025
+  Std iterations: 5.380993
+  Total time: 204.415408
+  Mean time: 0.008319
+  Std time: 0.009135
+

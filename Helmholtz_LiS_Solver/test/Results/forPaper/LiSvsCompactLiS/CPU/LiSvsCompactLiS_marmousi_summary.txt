@@ -1,0 +1,32 @@
+cpu_1025_257_1_1_marmousi_LiS_1_5_tol-0.1.csv:
+  Total iterations: 220
+  Mean iterations: 5.000000
+  Std iterations: 0.000000
+  Total time: 3.598293
+  Mean time: 0.081779
+  Std time: 0.179287
+
+cpu_1025_257_1_1_marmousi_compactLiS_1_5_tol-0.1.csv:
+  Total iterations: 280
+  Mean iterations: 5.000000
+  Std iterations: 0.000000
+  Total time: 3.865639
+  Mean time: 0.069029
+  Std time: 0.230501
+
+cpu_4097_1025_4_16_marmousi_LiS_1_5_tol-0.1.csv:
+  Total iterations: 27468
+  Mean iterations: 4.868486
+  Std iterations: 0.373852
+  Total time: 106.662420
+  Mean time: 0.018905
+  Std time: 0.005781
+
+cpu_4097_1025_4_16_marmousi_compactLiS_1_5_tol-0.1.csv:
+  Total iterations: 29202
+  Mean iterations: 4.951170
+  Std iterations: 0.235819
+  Total time: 53.061146
+  Mean time: 0.008996
+  Std time: 0.007691
+

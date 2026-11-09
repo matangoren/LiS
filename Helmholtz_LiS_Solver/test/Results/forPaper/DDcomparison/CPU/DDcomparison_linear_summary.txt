@@ -1,0 +1,48 @@
+cpu_1025_1025_DD_16_16_linear_GMRES_20_20_tol-0.1.csv:
+  Total iterations: 374891
+  Mean iterations: 20.308288
+  Std iterations: 6.734703
+  Total time: 82.452601
+  Mean time: 0.004467
+  Std time: 0.002242
+
+cpu_1025_1025_DD_1_1_linear_GMRES_20_20_tol-0.1.csv:
+  Total iterations: 2438
+  Mean iterations: 38.093750
+  Std iterations: 5.736873
+  Total time: 21.514522
+  Mean time: 0.336164
+  Std time: 0.048643
+
+cpu_1025_1025_DD_32_32_linear_GMRES_20_20_tol-0.1.csv:
+  Total iterations: 1130039
+  Mean iterations: 12.872363
+  Std iterations: 4.116328
+  Total time: 137.767403
+  Mean time: 0.001569
+  Std time: 0.001766
+
+cpu_1025_1025_DD_4_4_linear_GMRES_20_20_tol-0.1.csv:
+  Total iterations: 35379
+  Mean iterations: 32.819109
+  Std iterations: 7.504238
+  Total time: 24.819960
+  Mean time: 0.023024
+  Std time: 0.009678
+
+cpu_1025_1025_DD_8_8_linear_GMRES_20_20_tol-0.1.csv:
+  Total iterations: 117874
+  Mean iterations: 27.035321
+  Std iterations: 8.077262
+  Total time: 41.579503
+  Mean time: 0.009537
+  Std time: 0.003681
+
+cpu_257_257_DD_1_1_linear_GMRES_20_20_tol-0.1.csv:
+  Total iterations: 805
+  Mean iterations: 26.833333
+  Std iterations: 5.388899
+  Total time: 1.987982
+  Mean time: 0.066266
+  Std time: 0.234623
+
